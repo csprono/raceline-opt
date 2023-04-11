@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-
+import csv
 
 def image_setup(src):
     img_result = np.clip(src, 0, 255)
@@ -13,48 +13,58 @@ def image_setup(src):
 
 def find_centre(src):
     bin_img = image_setup(src)
-    
-    dist = cv.distanceTransform(bin_img, cv.DIST_L2, 3)
-    cv.normalize(dist, dist, 0, 1.0, cv.NORM_MINMAX)
-    _, dist = cv.threshold(dist, .9, 1.0, cv.THRESH_BINARY)
-    # cv.imshow('normal dist', dist)
-    cv.imwrite('dist.png', dist*255)
 
-    test = cv.imread('dist.png')
-   
-    # Convert the image to grayscale
-    test = cv.cvtColor(test, cv.COLOR_BGR2GRAY)
+    dist_map = cv.distanceTransform(bin_img, cv.DIST_L2, 3)
     
-    # Apply threshold to obtain a binary image
-    _, test = cv.threshold(test, 127, 255, cv.THRESH_BINARY)
+    mask = dist_map.copy()
 
-    dist = cv.ximgproc.thinning(test, test, cv.ximgproc.THINNING_GUOHALL)
-    # cv.imshow('thin dist',dist)
+    cv.normalize(mask, mask, 0, 1.0, cv.NORM_MINMAX)
+    _, mask = cv.threshold(mask, 0, 1, cv.THRESH_BINARY)
+    mask = mask.astype('uint8')
+    mask *= 255
     
+    mask = cv.ximgproc.thinning(mask, mask, cv.ximgproc.THINNING_GUOHALL)
+        
+    widths = cv.bitwise_and(dist_map, dist_map, mask=mask)
+        
+    mask = cv.cvtColor(mask, cv.COLOR_GRAY2BGR)
+    mask[np.where((mask == [255,255,255]).all(axis=2))] = [0,0,255]
+    
+    return mask, widths
 
-    dist = cv.cvtColor(dist, cv.COLOR_GRAY2BGR)
-    dist = dist.astype('uint8')
-    
-    
-    dist[np.where((dist == [255,255,255]).all(axis=2))] = [0,0,255]
-    
-    return dist
+def extract_points(array: np.array):
+    result = []
+    x_coords, y_coords = np.nonzero(array)
+
+    for i in range(len(x_coords)):
+        x, y = x_coords[i], y_coords[i]
+        result.append((x,y,array[x,y]))
+
+    with open('output/centre_line.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerows(result)
+
+    return result
 
 def main():
-    src = cv.imread('track.png')
+    src = cv.imread('input/track.png')
     result = src
     if src is None:
         print('ERROR: Image not found')
         exit(0)
     
-    centre = find_centre(src)
+    centre, widths = find_centre(src)
     
+    extract_points(widths)
+
     centre_mask = cv.inRange(centre, (0,0,255), (0,0,255))
 
     # Replace the corresponding pixels in image1 with those from image2
     result[centre_mask > 0] = centre[centre_mask > 0]
 
     cv.imshow('Source w/ centre overlay', result)
+    cv.imwrite('output/track_centre.png', result)
+    cv.imwrite('output/track_widths.png', widths)
 
     cv.waitKey(0)
     cv.destroyAllWindows()
