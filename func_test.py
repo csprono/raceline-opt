@@ -1,4 +1,4 @@
-import generate_centreline
+import src.centreline_gen.generate_centreline as generate_centreline
 
 import cProfile
 
