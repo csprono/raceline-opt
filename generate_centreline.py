@@ -7,8 +7,10 @@ def image_setup(src):
     img_result = img_result.astype('uint8')
 
     bw_img = cv.cvtColor(img_result, cv.COLOR_BGR2GRAY)
-    _, bw_img = cv.threshold(bw_img, 40, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
+    _, bw_img = cv.threshold(bw_img, 254, 255, cv.THRESH_BINARY)# | cv.THRESH_OTSU)
 
+    # cv.imshow('BW',bw_img)
+    # cv.waitKey(0)
     return bw_img
 
 def find_centre(src):
@@ -26,7 +28,7 @@ def find_centre(src):
     mask = cv.ximgproc.thinning(mask, mask, cv.ximgproc.THINNING_GUOHALL)
         
     widths = cv.bitwise_and(dist_map, dist_map, mask=mask)
-        
+    
     mask = cv.cvtColor(mask, cv.COLOR_GRAY2BGR)
     mask[np.where((mask == [255,255,255]).all(axis=2))] = [0,0,255]
     
@@ -38,7 +40,7 @@ def extract_points(array: np.array):
 
     for i in range(len(x_coords)):
         x, y = x_coords[i], y_coords[i]
-        result.append((x,y,array[x,y]))
+        result.append((x,y,array[x,y],array[x,y]))
 
     with open('output/centre_line.csv', 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
@@ -46,9 +48,10 @@ def extract_points(array: np.array):
 
     return result
 
+
 def main():
-    src = cv.imread('input/track.png')
-    result = src
+    src = cv.imread('input/hockenheim_map.png')
+    result_img = src
     if src is None:
         print('ERROR: Image not found')
         exit(0)
@@ -56,18 +59,20 @@ def main():
     centre, widths = find_centre(src)
     
     extract_points(widths)
-
+    
     centre_mask = cv.inRange(centre, (0,0,255), (0,0,255))
 
     # Replace the corresponding pixels in image1 with those from image2
-    result[centre_mask > 0] = centre[centre_mask > 0]
+    result_img[centre_mask > 0] = centre[centre_mask > 0]
 
-    cv.imshow('Source w/ centre overlay', result)
-    cv.imwrite('output/track_centre.png', result)
-    cv.imwrite('output/track_widths.png', widths)
+    # cv.imwrite('output/hockenheim_centre.png', result_img)
+    # cv.imwrite('output/hockenheim_widths.png', widths)
 
-    cv.waitKey(0)
-    cv.destroyAllWindows()
+    # result_img = cv.resize(result_img, (1000,1000))
+    # cv.imshow('Source w/ centre overlay', result_img)
+
+    # cv.waitKey(0)
+    # cv.destroyAllWindows()
 
 if __name__ == "__main__":
     main()
