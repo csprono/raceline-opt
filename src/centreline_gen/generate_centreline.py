@@ -49,7 +49,7 @@ def extract_points(array: np.array):
 def main(track):
     cwd = 'src/centreline_gen/'
 
-    src = cv.imread(path.join(cwd,'input/', track+'_map.png'))
+    src = cv.imread(path.join(cwd,'tracks/', track+'_map.png'))
     
     result_img = src
     if src is None:
