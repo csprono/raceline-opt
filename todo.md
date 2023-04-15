@@ -1,7 +1,8 @@
 # Spline Generation
-- fix centreline generation
+[x] fix centreline generation
     - need to change order of x coords
     - maybe use dfs
+[x] generate splines
 
 # Spline Calculations
 ## Trajectory Calculation
