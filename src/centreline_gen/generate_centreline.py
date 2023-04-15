@@ -8,10 +8,8 @@ def image_setup(src):
     img_result = img_result.astype('uint8')
 
     bw_img = cv.cvtColor(img_result, cv.COLOR_BGR2GRAY)
-    _, bw_img = cv.threshold(bw_img, 254, 255, cv.THRESH_BINARY)# | cv.THRESH_OTSU)
+    _, bw_img = cv.threshold(bw_img, 254, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
 
-    # cv.imshow('BW',bw_img)
-    # cv.waitKey(0)
     return bw_img
 
 def find_centre(src):
@@ -99,7 +97,7 @@ def main(track):
     cv.imwrite(path.join(cwd, 'output', track + '_centre.png'), result_img)
     cv.imwrite(path.join(cwd,'/output', track + '_widths.png'), widths)
 
-    with open(path.join(cwd, 'output/centre_line.csv'), 'w', newline='') as csvfile:
+    with open(path.join(cwd, 'output',track,'_centreline.csv'), 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerows(result)
     

@@ -19,3 +19,4 @@ def create_splines(centreline:np.ndarray):
     ax.plot(xi, yi, '-b')
     plt.show()
 
+    return tck
