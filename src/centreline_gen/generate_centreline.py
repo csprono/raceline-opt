@@ -35,15 +35,46 @@ def find_centre(src):
     
     return mask, widths
 
-def extract_points(array: np.array):
-    result = []
-    x_coords, y_coords = np.nonzero(array)
 
-    for i in range(len(x_coords)):
-        x, y = x_coords[i], y_coords[i]
-        result.append((x,y,array[x,y],array[x,y]))
+# #old function that messed up the spline generation because the points were not in 
+# #adjecent order (i.e. adjacent points weren't next to each other in the csv)
+# def extract_points(array: np.array):
+#     result = []
+#     x_coords, y_coords = np.nonzero(array)
 
-    return result
+#     for i in range(len(x_coords)):
+#         x, y = x_coords[i], y_coords[i]
+#         result.append((x,y,array[x,y],array[x,y]))
+
+#     return result
+
+def extract_points(img:np.ndarray):
+    visited = {}
+    stack = []
+    directions = [(0,1),(1,1),(1,0),(1,-1),(0,-1),(-1,-1),(-1,0),(-1,1)]
+    centreline = []
+    
+
+    start_y = img.shape[1] // 2 - 120
+    start_x = 0
+    while img[start_x][start_y] == 0.0:
+        start_x += 1
+    
+    start_point = (start_x,start_y)
+
+
+    stack.append(start_point)
+    while stack:
+        point = stack.pop()
+        if point not in visited:
+            visited[point] = True
+            centreline.append(point)
+            for vec in directions:
+                new_point = (point[0]+vec[0],point[1]+vec[1])
+                if img[new_point[0],new_point[1]] != 0.0 and new_point not in visited:
+                    stack.append(new_point)
+
+    return centreline
 
 
 def main(track):

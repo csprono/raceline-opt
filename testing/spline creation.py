@@ -9,18 +9,21 @@ track = np.loadtxt(r'src\centreline_gen\output\centre_line.csv',delimiter=',')
 # track = track[sorted_indices]
 
 
-# track = np.vstack([track, track[0]])
+
+def create_splines(centreline:np.ndarray):
+    centreline = np.vstack([centreline, centreline[0]])
+    
+    x = centreline[::,0]
+    y = centreline[::,1]
+    
+    tck,u = interpolate.splprep([x,y], s=300, per=True)
+    xi, yi = interpolate.splev(np.linspace(0,1, len(x)), tck)
+    
+    # plot the result
+    fig, ax = plt.subplots(1, 1)
+    ax.plot(x, y, 'or')
+    ax.plot(xi, yi, '-b')
+    plt.show()
 
 
-
-x = track [:100:,0]
-y = track[:100:,1]
-
-tck,u = interpolate.splprep([x,y], s=0,)
-xi, yi = interpolate.splev(np.linspace(0, 1, 1000), tck)
-
-# plot the result
-fig, ax = plt.subplots(1, 1)
-ax.plot(x, y, 'or')
-ax.plot(xi, yi, '-b')
-plt.show()
+create_splines(track)
