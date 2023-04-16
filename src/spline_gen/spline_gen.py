@@ -8,10 +8,10 @@ def create_splines(centreline:np.ndarray):
     x = centreline[::,0]
     y = centreline[::,1]
     
-    tck, u = interpolate.splprep([x,y], s=300, per=True)
+    spline_tck, u = interpolate.splprep([x,y], s=300, per=True)
     
     #evaluate spline at given point
-    xi, yi = interpolate.splev(np.linspace(0,1, len(x)), tck)
+    xi, yi = interpolate.splev(u, spline_tck)
     
     # plot the result
     fig, ax = plt.subplots(1, 1)
@@ -19,4 +19,4 @@ def create_splines(centreline:np.ndarray):
     ax.plot(xi, yi, '-b')
     plt.show()
 
-    return tck
+    return spline_tck, u
