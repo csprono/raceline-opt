@@ -7,8 +7,8 @@ from math import atan, pi
 def create_splines(centreline:np.ndarray):
     centreline = np.vstack([centreline, centreline[0]])
     
-    x = centreline[:5:,0]
-    y = centreline[:5:,1]
+    x = centreline[::,0]
+    y = centreline[::,1]
     
     spline_tck, u = interpolate.splprep([x,y], s=300) 
     
@@ -55,8 +55,8 @@ def calc_bearing(line_properties:tuple):
 
 def main():
     centreline = np.loadtxt(r'src\centreline_gen\output\centre_line.csv', delimiter = ',')
-    x = centreline[:5:,0]
-    y = centreline[:5:,1]
+    x = centreline[::,0]
+    y = centreline[::,1]
 
     spline_tck, u = create_splines(centreline)
     spline_x, spline_y = interpolate.splev(u, spline_tck)
