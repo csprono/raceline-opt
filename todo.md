@@ -61,3 +61,7 @@
     - else slope = undefined
       - bearing = 0 
     - NB: maybe investigate using np.where()
+
+
+# Velocity Profile
+- [ ] calculate max velocity around curves 
