@@ -3,17 +3,18 @@
 - [x] fix centreline generation
     - need to change order of x coords
     - maybe use dfs
-- [x] generate splines
+- [x] generate splines 
     - [ ] make more accurate
-      -  adjust the smoothing 
-         -  find difference between centreline points and spline points. Make difference small as possible
-      -  maybe make dynamic? (not sure if possible)
-         -  different parts of track have different smoothing
+      - ideas:
+        -  adjust the smoothing: find difference between centreline points and spline points. Make difference small as possible
+           -  maybe make dynamic (different parts of track have different smoothing) (not sure if possible)
+        - use different spline type
+          - e.g. cubic spline
 
 # Spline Calculations
 ## Trajectory Calculation
 - trajectory = heading of spline
-  - [] calculate bearing of tangents
+  - [x] calculate bearing of tangents
     - create triangle using north for 1 line
 - use tangent of curve at a point
   - [x] calculate slope and y intercept of tangent
@@ -64,4 +65,9 @@
 
 
 # Velocity Profile
+- [ ] calculate curvature of turns
+  - $\kappa=\left\| \frac{d T}{ds} \right\|$
+    - size of rate of change of tangent vector with respect to arc length
+  - 
 - [ ] calculate max velocity around curves 
+- [ ] 
