@@ -15,11 +15,11 @@ def create_splines(centreline:np.ndarray):
     #evaluate spline at given point
     xi, yi = interpolate.splev(u, spline_tck)
     
-    # plot the result
-    fig, ax = plt.subplots(1, 1)
-    ax.plot(x, y, 'or')
-    ax.plot(xi, yi, '-b')
-    plt.show()
+    # # plot the result
+    # fig, ax = plt.subplots(1, 1)
+    # ax.plot(x, y, 'or')
+    # ax.plot(xi, yi, '-b')
+    # plt.show()
 
     return spline_tck, u
 
@@ -67,11 +67,26 @@ def main():
     x = centreline[::,0]
     y = centreline[::,1]
 
-    spline_tck, u = create_splines(centreline)
+    spline_tck, u = interpolate.splprep([x,y], s=175)
     spline_x, spline_y = interpolate.splev(u, spline_tck)
 
-    normal_properties = calc_normals(spline_tck, u, spline_x, spline_y)
-    tangent_properties = calc_tangents(spline_tck, u, spline_x, spline_y)
+    dx_dt, dy_dt = interpolate.splev(u, spline_tck, der=1)
+    ddx_dt, ddy_dt = interpolate.splev(u, spline_tck, der=2)
+    
+
+    magnitude = (dx_dt ** 2 + dy_dt ** 2) ** 0.5
+    unit_tangent_vector = (dx_dt / magnitude, dy_dt / magnitude)
+
+    numerator = abs(ddx_dt * unit_tangent_vector[1] - ddy_dt * unit_tangent_vector[0])
+    denominator = (dx_dt ** 2 + dy_dt ** 2) ** (3 / 2)
+    curvature = numerator / denominator
+
+    fig, ax = plt.subplots()
+    colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+  
+    plt.plot([spline_x,spline_x+unit_tangent_vector[0]], [spline_y,spline_y+unit_tangent_vector[1]])
+    plt.plot(spline_x,spline_y)
+    plt.show()
 
 
 
